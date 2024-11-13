@@ -1,12 +1,23 @@
 #!/usr/bin/python
 
 import argparse
+import textwrap
 
 def getArgs() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="python ./Deduper -f <sam file> -o <output file>")
-    parser.add_argument("-f", "--file",help="Input Sam file", type=str, required=True)
-    parser.add_argument("-u", "--umi", help="valid UMI file", type=str, required=False)
-    parser.add_argument("-o", "--outfile", help="Output file", type=str, required=True)
+    parser = argparse.ArgumentParser(prog='python ./Wells_deduper.py',
+		description="Remove PCR duplicates from a sorted sam file",
+		formatter_class=argparse.RawDescriptionHelpFormatter,
+		epilog=textwrap.dedent('''\
+A software tool to remove all PCR duplicates from a sorted sam file containing 
+uniquely mapped reads, such that only a single copy of each read is maintained 
+in an output sam file. The software tool created should minimize usage of memory 
+during execution and accurately identify all potential instances of 
+PCR duplicfication.\n
+         '''))
+    parser.add_argument("-f", "--file",help="Input sorted sam file", type=str, required=True)
+    parser.add_argument("-u", "--umi", help="valid UMI file", type=str, required=True)
+    parser.add_argument("-o", "--outfile", help="output file", type=str, required=True)
+	
     return parser.parse_args()
 
 def getUMI(qname : str) -> str:
@@ -39,7 +50,7 @@ def getFivePrimePosition(cigar : str, pos : int, strand : bool) -> int:
 		return tempPos
 	#if reverse strand
 	else:
-		#return position + read length
+		#return position + length
 		return (tempPos + getCigarLength(cigar))
 
 def getFrontClip(cigar : str) -> int:
